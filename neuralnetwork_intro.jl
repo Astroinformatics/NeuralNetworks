@@ -47,24 +47,6 @@ md"""
 ### Read data from file
 """
 
-# ╔═╡ 49f371db-1ad1-4f1c-b5e2-c00a52035c6a
-begin
-	filename = "quasar2.csv"
-	url = "https://scholarsphere.psu.edu/resources/edc61b33-550d-471d-8e86-1ff5cc8d8f4d/downloads/19732"
-	data_path = find_data_path(filename, url);
-
-
-# ╔═╡ 85066779-be0f-43a3-bde8-c4ab5a3e5ca3
-begin
-	df = CSV.read(data_path, DataFrame, limit=1_000_000, select=[:ug, :gr, :ri, :iz, :zs1, :s1s2, :label],  ntasks=1)
-	df[:,:label] .= 1 .- df[:,:label]  # Make label=1 for high-z quaesars
-	col_names = names(df)
-	df
-end
-
-# ╔═╡ f6e68394-34b6-453c-929f-7cc89434e179
-base_rate_input = sum(df.label.==1)/length(df.label)
-
 # ╔═╡ 1c792c1d-f1e8-4e5f-8a76-5c7ca5fb8587
 md"""
 ### Create subsets of data for training & testing
@@ -83,19 +65,6 @@ md"""
 Undersample non-high-${z}$ quasars to make for balanced datasets?
 $(@bind make_balanced CheckBox(default=true))
 """
-
-# ╔═╡ 0985bcc3-e686-4aa9-b832-0141cb27c4a4
-begin 
-	frac_data_used_for_cv = 0.66
-	df_cv, df_test = stratifiedobs(x->x.label==1, shuffleobs(df), p=frac_data_used_for_cv);
-	if make_balanced 
-		df_cv = undersample(x->Bool(x.label),df_cv)
-		df_test = undersample(x->Bool(x.label),df_test)
-	end
-end;
-
-# ╔═╡ 798d218e-47d7-4c1a-bef4-8a93c0e52236
-(;num_in_cv_set = size(df_cv,1), num_in_test_set = size(df_test,1) )
 
 # ╔═╡ ffe4cdc7-4863-4f0e-b790-4b86afcc56b8
 md"""
@@ -120,9 +89,6 @@ If you haven't worked through the [logistic regression application lab](), it's 
 
 We specify a formula specifying that we want to predict the data in column "label" using input data in all the other columns (and an offset term).
 """
-
-# ╔═╡ fecc9af4-7486-4d21-87bb-5ed1e35cdf6c
-fm_logistic_regression = term("label") ~ term(1) + sum(term.(setdiff(col_names,["label"])));
 
 # ╔═╡ 65472ed7-4c0a-4695-8dc3-94575a0241dd
 md"And we fit a logistic regresion model to the selected training dataset."
@@ -313,6 +279,40 @@ function find_or_download_data(data_filename::String, url::String)
 	return data_path		
 end
 
+
+# ╔═╡ 49f371db-1ad1-4f1c-b5e2-c00a52035c6a
+begin
+	filename = "quasar2.csv"
+	url = "https://scholarsphere.psu.edu/resources/edc61b33-550d-471d-8e86-1ff5cc8d8f4d/downloads/19732"
+	data_path = find_or_download_data(filename, url);
+end
+
+# ╔═╡ 85066779-be0f-43a3-bde8-c4ab5a3e5ca3
+begin
+	df = CSV.read(data_path, DataFrame, limit=1_000_000, select=[:ug, :gr, :ri, :iz, :zs1, :s1s2, :label],  ntasks=1)
+	df[:,:label] .= 1 .- df[:,:label]  # Make label=1 for high-z quaesars
+	col_names = names(df)
+	df
+end
+
+# ╔═╡ f6e68394-34b6-453c-929f-7cc89434e179
+base_rate_input = sum(df.label.==1)/length(df.label)
+
+# ╔═╡ 0985bcc3-e686-4aa9-b832-0141cb27c4a4
+begin 
+	frac_data_used_for_cv = 0.66
+	df_cv, df_test = stratifiedobs(x->x.label==1, shuffleobs(df), p=frac_data_used_for_cv);
+	if make_balanced 
+		df_cv = undersample(x->Bool(x.label),df_cv)
+		df_test = undersample(x->Bool(x.label),df_test)
+	end
+end;
+
+# ╔═╡ 798d218e-47d7-4c1a-bef4-8a93c0e52236
+(;num_in_cv_set = size(df_cv,1), num_in_test_set = size(df_test,1) )
+
+# ╔═╡ fecc9af4-7486-4d21-87bb-5ed1e35cdf6c
+fm_logistic_regression = term("label") ~ term(1) + sum(term.(setdiff(col_names,["label"])));
 
 # ╔═╡ ce34a578-ceaf-4c6e-aa73-9ab54cf3cf99
 function stratified_kfolds(label::AbstractVector, data, num_folds::Integer)
