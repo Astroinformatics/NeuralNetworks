@@ -19,11 +19,11 @@ begin
 	using Downloads
 	using CSV, DataFrames
 	using MLBase, MLDataUtils
-	
+
 	using StatsBase, GLM
 	using Flux
 	using Flux: sigmoid, binarycrossentropy, logitbinarycrossentropy
-	
+
 	using Plots#, LaTeXStrings
 	using ValueHistories
 	using PlutoUI, ProgressLogging
@@ -32,11 +32,11 @@ end
 # ╔═╡ 2671099c-667e-4c1b-9e5d-f41bd5752938
 md"""
 ## Overview
-In this lab, we'll revise the dataset of SDSS & Spitzer photometry with the goal of developing an improved classifier to identify high-${z}$ quaesars.
-We'll start by fitting logistic regression models using the framework of generlized linear models.  
-Then, we'll train an equivalent neural network classifer.  
+In this lab, we'll revise the dataset of SDSS & Spitzer photometry with the goal of developing an improved classifier to identify high-${z}$ quasars.
+We'll start by fitting logistic regression models using the framework of generalized linear models.  
+Then, we'll train an equivalent neural network classifier.  
 You'll get a chance to explore different strategies for training the model.  
-Finally, you'll get a chance explore more complex neural network architectures and see if you can build a significantly better neural network classifer.  
+Finally, you'll get a chance explore more complex neural network architectures and see if you can build a significantly better neural network classifier.  
 
 As before, we first need to read in the dataset.
 """
@@ -57,7 +57,7 @@ The starter code places 66% of the observations into `df_cv` and the rest into `
 Since high-${z}$ quasars are relatively rare, we'll make a point of using [stratified sampling](https://en.wikipedia.org/wiki/Stratified_sampling), so that both `df_cv` and `df_test` have (nearly) the same fraction of high-${z}$ quasars.
 
 Similarly, since high-${z}$ quasars are relatively rare in our dataset, one might undersampling the other objects, so that our dataset is nearly balanced.  
-(Once you've worked through the first section of the notebook, you might want to come back and uncheck the box and see how the resutls change if you use an unbalanced training set.)
+(Once you've worked through the first section of the notebook, you might want to come back and uncheck the box and see how the results change if you use an unbalanced training set.)
 """
 
 # ╔═╡ 26635f45-1e34-4025-8151-2185d8d84e06
@@ -70,7 +70,7 @@ $(@bind make_balanced CheckBox(default=true))
 md"""
 ### Constructing subset for K-fold cross-validation
 Eventually, you'll be experimenting with multiple neural network architectures.  
-We want to save the data in `df_test` for testing after we've finalized all our model choices. 
+We want to save the data in `df_test` for testing after we've finalized all our model choices.
 In the mean time, we'll want to have subsets of the observations in `df_cv` for training and validating as part of a **k-fold cross-validation** process.
 
 Below, you can choose how many "folds" to use and which fold will be used for training our logistic regression and neural network models.
@@ -130,9 +130,9 @@ md"In the subsequent sections on neural networks, we'll use a loss function that
 md"""
 ## Simple Neural Network for Logistic Regression
 Logistic regression can be represented as a very simple neural network.  
-Doing so will allow us to try out some of the tools and programming patterns used for training neural networks, while still getting (reasonably) prompt feedback. 
+Doing so will allow us to try out some of the tools and programming patterns used for training neural networks, while still getting (reasonably) prompt feedback.
 
-To implement logistic regression as a neural network, we'll connect all six of the input parameters (six nodes in the input layer) to one node in the output layer and use the sigmoid transfer function (`sigmoid(x) = 1/(1+exp(-x))`).  This pattern is so common that any library for building neural networks will provide a function to build such a neural network easily.  Using Julia's Flux packge, it's just `model_nn0 = Dense(6, 1, Flux.sigmoid)`.
+To implement logistic regression as a neural network, we'll connect all six of the input parameters (six nodes in the input layer) to one node in the output layer and use the sigmoid transfer function (`sigmoid(x) = 1/(1+exp(-x))`).  This pattern is so common that any library for building neural networks will provide a function to build such a neural network easily.  Using Julia's Flux package, it's just `model_nn0 = Dense(6, 1, Flux.sigmoid)`.
 """
 
 # ╔═╡ ddb12c2e-2764-432c-bc08-c056689e26fd
@@ -143,7 +143,7 @@ To train a neural network, we need to specify several key elements:
 - training data: The observational data to be used by the loss function
 - optimizer:  The algorithm that will be used for updating the parameters of the neural network.
 
-Since neural networks can have *lots* of parameters, neural network libraires provide convenience functions to extract the parameters from a network.  We did that above with Flux's `params` function.  
+Since neural networks can have *lots* of parameters, neural network libraries provide convenience functions to extract the parameters from a network.  We did that above with Flux's `params` function.  
 """
 
 # ╔═╡ 5abe0169-d7e1-4fd2-b5b5-aae1a693572a
@@ -161,7 +161,7 @@ As discussed in the logistic regression lab, the log likelihood for logistic reg
 
 $\ell(w)= \sum_{i=1}^n\left[y_i\log(h_w(x_i)) + (1-y_i)\log(1-h_w(x_i))\right],$
 
-where $y_i$ are the labels for the $i$th object and $x_i$ are the input data for the $i$th object and $h_w(x_i)$ is the value of the output node, evaluated for the input data $x_i$.  The subscript $w$ emphasises that the output of the neural network depends on a the values of the network's weights (and biases).
+where $y_i$ are the labels for the $i$th object and $x_i$ are the input data for the $i$th object and $h_w(x_i)$ is the value of the output node, evaluated for the input data $x_i$.  The subscript $w$ emphasizes that the output of the neural network depends on a the values of the network's weights (and biases).
 
 We estimate weights $w$ by the values that maximize the log-likelihood function above, or equivalently the values that minimize the negative log-likelihood function divided by the number of observations.  This is already coded up as the function `binarycrossentropy(predictions, observations)`.
 
@@ -192,13 +192,13 @@ begin
 	reinit_nn  # trigger rerunning this cell when button is clicked
 	# define neural network w/ 6 inputs, 1 output (and 0 hidden layers)
 	model_nn0 = Dense(6, 1, sigmoid)  
-	# extract the parameters of that neural netowrk
+	# extract the parameters of that neural network
 	nn_param = Flux.params(model_nn0)  
 end;
 
 # ╔═╡ aca55f65-b364-4c20-8cc1-1dd0d4102ea1
 loss(x,y) = Flux.binarycrossentropy(model_nn0(x), y)
-#=  Or we could write the equivalent loss function ourselves using 
+#=  Or we could write the equivalent loss function ourselves using
 function loss(x_obs,y_obs)
 	ϵ = 1e-12  # To prevent issues with log(0)
 	pred = model_nn0(x_obs)
@@ -208,7 +208,7 @@ end
 
 # ╔═╡ ff3f98bf-d3b6-4937-86d1-47e0080a6568
 md"""
-**Question:**  How many iterations did you need to acheive a neural network classifier that performs comparably to the logistic regrssion classifier above?
+**Question:**  How many iterations did you need to acheive a neural network classifier that performs comparably to the logistic regression classifier above?
 
 **Question:**  How does the computational cost of training the neural network compare to the cost of fitting the logistic regression model?  What factors contribute to the difference?
 
@@ -238,13 +238,13 @@ md"Check once you're ready to proceed to neural networks using one or more hidde
 
 # ╔═╡ f5f1ff7c-c674-4147-9ec1-b1b0f1a8d18a
 md"Number of hidden layers: $(@bind num_hidden_layers NumberField(1:3,default=1))"
-	
+
 
 # ╔═╡ 51218a3f-c7b9-4f8e-8b85-c2e8013cd13d
 md"""
 **Question:**  How does the number of iterations required to train the model well compare to the simpler neural network from the previous section?
 
-**Question:**  How does the resulting classifer compare that of the simple neural network or the logistic regression classifier?  
+**Question:**  How does the resulting classifier compare that of the simple neural network or the logistic regression classifier?  
 
 **Question:**  Can you find a network architecture and training strategy that performs significantly better than the simple neural network and the logistic regression classifier?  What are its properties?  
 
@@ -271,7 +271,7 @@ function find_or_download_data(data_filename::String, url::String)
 		isdir(data_path) || mkdir(data_path)
 		data_path = joinpath(data_path,"data")
 		isdir(data_path) || mkdir(data_path)
-	end	
+	end
 	data_path = joinpath(data_path,data_filename)
 	if !(filesize(data_path) > 0)
 		Downloads.download(url, data_path)
@@ -290,7 +290,7 @@ end
 # ╔═╡ 85066779-be0f-43a3-bde8-c4ab5a3e5ca3
 begin
 	df = CSV.read(data_path, DataFrame, limit=1_000_000, select=[:ug, :gr, :ri, :iz, :zs1, :s1s2, :label],  ntasks=1)
-	df[:,:label] .= 1 .- df[:,:label]  # Make label=1 for high-z quaesars
+	df[:,:label] .= 1 .- df[:,:label]  # Make label=1 for high-z quasars
 	col_names = names(df)
 	df
 end
@@ -299,10 +299,10 @@ end
 base_rate_input = sum(df.label.==1)/length(df.label)
 
 # ╔═╡ 0985bcc3-e686-4aa9-b832-0141cb27c4a4
-begin 
+begin
 	frac_data_used_for_cv = 0.66
 	df_cv, df_test = stratifiedobs(x->x.label==1, shuffleobs(df), p=frac_data_used_for_cv);
-	if make_balanced 
+	if make_balanced
 		df_cv = undersample(x->Bool(x.label),df_cv)
 		df_test = undersample(x->Bool(x.label),df_test)
 	end
@@ -325,7 +325,7 @@ function stratified_kfolds(label::AbstractVector, data, num_folds::Integer)
 end
 
 # ╔═╡ c41187d6-4306-4a92-b10e-c7825e79e79e
-begin 
+begin
 	# For GLM models
 	classify(model::RegressionModel, data::AbstractDataFrame; threshold::Real=0.5) = predict(model,data).>=threshold
 	# For Flux models
@@ -341,7 +341,7 @@ accuracy(model, data::AbstractDataFrame, y::AbstractVector ) =
 function confusion_matrix_int01(a, b)
 	@assert all(map(x->in(x,(0,1)),a))
 	@assert all(map(x->in(x,(0,1)),b))
-	transpose(hcat(.!Bool.(a), Bool.(a))) * hcat(.!Bool.(b), Bool.(b)) 
+	transpose(hcat(.!Bool.(a), Bool.(a))) * hcat(.!Bool.(b), Bool.(b))
 end
 
 # ╔═╡ 7931116b-3b3f-455c-80aa-17de872a8965
@@ -351,7 +351,7 @@ function calc_classification_diagnostics(model, data, label; threshold = 0.5)
 	num_true_negatives  = sum(  label.==0 .&& .!pred)
 	num_false_negatives = sum(  label.==1 .&& .!pred)
 	num_false_positives = sum(  label.==0 .&&   pred)
-	
+
 	num_condition_positives = num_true_positives + num_false_negatives
 	num_condition_negatives = num_true_negatives + num_false_positives
 	num_total = num_condition_positives + num_condition_negatives
@@ -369,7 +369,7 @@ function calc_classification_diagnostics(model, data, label; threshold = 0.5)
 	return (;threshold, accuracy, false_discovery_rate, false_omission_rate, F1_score,
 		false_positive_rate, false_negative_rate, true_positive_rate, true_negative_rate,
 		num_true_positives, num_true_negatives, num_false_positives, num_false_negatives,   
-		num_condition_positives, num_condition_negatives, num_predicted_positives, num_predicted_negatives, 
+		num_condition_positives, num_condition_negatives, num_predicted_positives, num_predicted_negatives,
 		num_total, prevalence )
 end
 
@@ -378,27 +378,27 @@ function run_cv_on_logistic_regression(df::AbstractDataFrame, folds_idx)
 	@assert length(folds_idx)>=1
 	@assert isa(first(folds_idx), AbstractVector{Int64})
 	@assert length(first(folds_idx))>=1
-	local history = MVHistory() 
+	local history = MVHistory()
 	# fold_idx comes from something like StratifiedKfold(df.label, num_folds )
 	for (i,train_idx) in enumerate(folds_idx)
 		validation_idx = setdiff(1:length(df.label),train_idx)
 		model_logistic_regression = glm(fm_logistic_regression, df[train_idx,:], Binomial(), ProbitLink())
-		
+
 		result_train = calc_classification_diagnostics(model_logistic_regression, df[train_idx,:], df.label[train_idx])
 		result_validation = calc_classification_diagnostics(model_logistic_regression, df[validation_idx,:], df.label[validation_idx])
-		
+
 		push!(history, :model, i, model_logistic_regression)
 		push!(history, :loglikelihood, i, loglikelihood(model_logistic_regression))
 		push!(history, :results_train, i, result_train)
 		push!(history, :results_validation, i, result_validation)		
 	end
-	return history 
+	return history
 end
 
 # ╔═╡ 7179f3e7-7b8a-468b-847d-5962ce0c1a93
 function my_train!(model_nn::Union{Dense,Chain}, loss::Function, param::Flux.Zygote.Params{PT},
-				train_data::DT, optimizer::Flux.Optimise.AbstractOptimiser; 
-				#= begin optional parameters =# 
+				train_data::DT, optimizer::Flux.Optimise.AbstractOptimiser;
+				#= begin optional parameters =#
 				epochs::Integer=1, test_data = nothing) where { PT<:Any, MT1<:AbstractMatrix, MT2<:AbstractMatrix, DT<:Tuple{MT1,MT2} }
 	@assert 1<=epochs<Inf
 	if !isnothing(test_data)
@@ -413,7 +413,7 @@ function my_train!(model_nn::Union{Dense,Chain}, loss::Function, param::Flux.Zyg
 			push!(history, :results_test, i, results_test)
 			loss_test = loss(x_test, y_test)
 			push!(history, :loss_test, i, loss_test )
-		
+
 		end
   		gs = gradient(param) do
 		    loss(x,y)
@@ -421,7 +421,7 @@ function my_train!(model_nn::Union{Dense,Chain}, loss::Function, param::Flux.Zyg
 		push!(history, :loss, i, loss(x,y) )
 		push!(history, :results_train, i, results_train)
 		push!(history, :param, i, param)		
-		
+
   		Flux.Optimise.update!(optimizer, param, gs)
 	end
 	return history
@@ -444,16 +444,16 @@ function plot_classifier_training_history(h::MVHistory, idx_plt)
 	if haskey(h,:results_test)
 		scatter!(plt1,get(h,:results_test)[1][idx_plt],
 						get.(get(h,:results_test)[2][idx_plt],
-							:false_discovery_rate,nothing), 
+							:false_discovery_rate,nothing),
 						ms=2, markerstrokewidth=0, alpha=0.5, label="Validation")
 		scatter!(plt2,get(h,:results_test)[1][idx_plt],
 						get.(get(h,:results_test)[2][idx_plt],
-							:false_omission_rate,nothing), 
+							:false_omission_rate,nothing),
 						ms=2, markerstrokewidth=0, alpha=0.5, label="Validation")
 		plot!(plt3,get(h,:loss_test)[1][idx_plt],
 					get(h,:loss_test)[2][idx_plt],
 						alpha=0.7, label="Validation")
-		
+
 	end
 	l = @layout [ a;  b c]
 	plot(plt3, plt1,plt2, layout=l)
@@ -499,8 +499,8 @@ lr_cv_results = run_cv_on_logistic_regression(df_cv, list_of_folds_idx);
 # ╔═╡ 465c5c55-0d6d-444e-85fe-c40e4b79c462
 let
 	plt1 = plot(legend=:topleft)
-	train_fdr = get.(get(lr_cv_results,:results_train)[2],:false_discovery_rate,nothing) 
-	valid_fdr = get.(get(lr_cv_results,:results_validation)[2],:false_discovery_rate,nothing) 
+	train_fdr = get.(get(lr_cv_results,:results_train)[2],:false_discovery_rate,nothing)
+	valid_fdr = get.(get(lr_cv_results,:results_validation)[2],:false_discovery_rate,nothing)
 	h_fdr = fit(Histogram, vcat(train_fdr,valid_fdr), nbins=20)
 
 	histogram!(plt1,train_fdr, bins=h_fdr.edges, label="Train")
@@ -513,12 +513,12 @@ let
 	train_for = get.(get(lr_cv_results,:results_train)[2],:false_omission_rate,nothing)
 	valid_for = get.(get(lr_cv_results,:results_validation)[2],:false_omission_rate,nothing)
 	h_for = fit(Histogram, vcat(train_for, valid_for), nbins=20)
-	
+
 	histogram!(plt2, train_for, bins=h_for.edges, label="Train")
 	histogram!(plt2, valid_for, bins=h_for.edges, label="Validation")
 	xlabel!(plt2,"False Omission Rate")
 	xlims!(plt2,0,maximum(first(h_for.edges)))
-	
+
 	l = @layout [a;b]
 	plot(plt1,plt2, layout=l)
 end
@@ -536,7 +536,7 @@ lr_cv_loss = -loglikelihood.(get(lr_cv_results,:model)[2])./length.(list_of_fold
 (;lr_cv_loss_mean = mean(lr_cv_loss), lr_cv_loss_std = std(lr_cv_loss) )
 
 # ╔═╡ 6f2c856c-3bd3-4d35-be93-1b78c68c6b29
-begin 
+begin
 	train_Xy, validation_Xy = df_train_list[param_fold.fold_id], df_validation_list[param_fold.fold_id]
 	# Make some convenient variable names for use later
 	train_X = select(train_Xy, Not(:label), copycols=false)
@@ -555,21 +555,21 @@ begin
 	confusion_validation = confusion_matrix_int01(validation_y.label, classify(model_logistic_regression, validation_X) ) ./length(validation_y.label)
 
 	confusion_testing = confusion_matrix_int01(df_test.label, classify(model_logistic_regression, df_test) )./length(df_test.label)
-	
+
 	(;train=confusion_training, valid=confusion_validation, test=confusion_testing)
 end
 
 # ╔═╡ 0a736aaa-ba63-41ab-aab1-3f33f6cb7db0
-@bind opt_param confirm( 
+@bind opt_param confirm(
 	PlutoUI.combine() do Child
 		md"""
 		Learning Rate:  $( Child("learning_rate",NumberField(0.05:0.05:1, default=0.9)) )
-		$nbsp $nbsp $nbsp 
+		$nbsp $nbsp $nbsp
 		Optimizer:  $( Child("type",Select([Descent => "Gradient Descent", Nesterov => 	"Nesterov Momentum", ADAM => "ADAM" ])) )
-		
-		
-		Iterations:  $( Child("iterations",NumberField(10:10:2000, default=100))) 
-		$nbsp $nbsp $nbsp 
+
+
+		Iterations:  $( Child("iterations",NumberField(10:10:2000, default=100)))
+		$nbsp $nbsp $nbsp
 		Compute validation data: $( Child("calc_validation_results", CheckBox()))
 		"""
 	end
@@ -583,10 +583,10 @@ begin
 	local train_data = (Matrix(train_X)', Matrix(train_y)')
 	if opt_param.calc_validation_results
 		local validation_data = (Matrix(validation_X)', Matrix(validation_y)')
-		history_nn0 = my_train!(model_nn0, loss, nn_param, train_data, optimizer, 
+		history_nn0 = my_train!(model_nn0, loss, nn_param, train_data, optimizer,
 					test_data = validation_data , epochs=opt_param.iterations)
 	else
-		history_nn0 = my_train!(model_nn0, loss, nn_param, train_data, optimizer, 
+		history_nn0 = my_train!(model_nn0, loss, nn_param, train_data, optimizer,
 					epochs=opt_param.iterations)
 	end
 end;
@@ -646,14 +646,14 @@ end
 
 # ╔═╡ c799d55a-2fb9-4b0a-8ebf-12f9cd4b95db
 begin
-	@bind my_opt_param confirm( 
+	@bind my_opt_param confirm(
 	PlutoUI.combine() do Child
 		md"""
 		Learning Rate:  $( Child("learning_rate",NumberField(0.05:0.05:1, default=0.9)) )
 		$nbsp $nbsp $nbsp
 		Optimizer:  $( Child("type",Select([Descent => "Gradient Descent", Nesterov => 	"Nesterov Momentum", ADAM => "ADAM" ], default=Nesterov)) )
 		$nbsp $nbsp $nbsp
-		Iterations:  $( Child("iterations",NumberField(10:10:2000, default=500))) 
+		Iterations:  $( Child("iterations",NumberField(10:10:2000, default=500)))
 		"""
 	end
 	)
@@ -668,13 +668,13 @@ end;
 if ready_for_hidden
 	local train_data = (Matrix(train_X)', Matrix(train_y)')
 	local validation_data = (Matrix(validation_X)', Matrix(validation_y)')
-	
-	history_my_nn = my_train!(model_my_nn, my_loss, my_nn_param, train_data, my_optimizer, 
+
+	history_my_nn = my_train!(model_my_nn, my_loss, my_nn_param, train_data, my_optimizer,
 					test_data = validation_data, epochs=my_opt_param.iterations)
 end;
 
 # ╔═╡ 86499d0e-bad3-4954-a740-68cba383d790
-if ready_for_hidden 
+if ready_for_hidden
 md"""
 First iteration to plot: $(@bind first_iter_to_plot_hidden Slider(1:my_opt_param.iterations))
 Last iteration to plot: $(@bind last_iter_to_plot_hidden Slider(1:my_opt_param.iterations,default=my_opt_param.iterations))
