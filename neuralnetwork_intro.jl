@@ -36,7 +36,7 @@ In this lab, we'll revise the dataset of SDSS & Spitzer photometry with the goal
 We'll start by fitting logistic regression models using the framework of generalized linear models.  
 Then, we'll train an equivalent neural network classifier.  
 You'll get a chance to explore different strategies for training the model.  
-Finally, you'll get a chance explore more complex neural network architectures and see if you can build a significantly better neural network classifier.  
+Finally, you'll get a chance to explore more complex neural network architectures and see if you can build a significantly better neural network classifier.  
 
 As before, we first need to read in the dataset.
 """
@@ -56,7 +56,7 @@ The starter code places 66% of the observations into `df_cv` and the rest into `
 
 Since high-${z}$ quasars are relatively rare, we'll make a point of using [stratified sampling](https://en.wikipedia.org/wiki/Stratified_sampling), so that both `df_cv` and `df_test` have (nearly) the same fraction of high-${z}$ quasars.
 
-Similarly, since high-${z}$ quasars are relatively rare in our dataset, one might undersampling the other objects, so that our dataset is nearly balanced.  
+Similarly, since high-${z}$ quasars are relatively rare in our dataset, one might try undersampling the other objects, so that our dataset is nearly balanced.  
 (Once you've worked through the first section of the notebook, you might want to come back and uncheck the box and see how the results change if you use an unbalanced training set.)
 """
 
@@ -109,7 +109,7 @@ md"""
 # ╔═╡ 7022d21e-10f3-46ac-a5fa-b4b6f7ab7881
 md"""
 ### Compare results across folds
-Since generlized linear regression is computationally efficient, we can go ahead and fit a logistic regression model to each of the folds of data.  
+Since generalized linear regression is computationally efficient, we can go ahead and fit a logistic regression model to each of the folds of data.  
 
 Below we show histograms of the false discovery rates and false omission rates for each fold.  
 The next cell shows the coefficients fit to each training fold.  
@@ -120,7 +120,7 @@ md"We can compute the mean and standard deviation of each coefficient across dif
 
 # ╔═╡ 54f52161-2337-40fc-a743-58cc0492726f
 md"""
-**Question:** How doe the mean and standard deviation of coefficients from the cross validation procedure compare to the standard errors returned by the `glm` function above?  What factors could contribute to the differences?
+**Question:** How do the mean and standard deviation of coefficients from the cross validation procedure compare to the standard errors returned by the `glm` function above?  What factors could contribute to the differences?
 """
 
 # ╔═╡ 84c733a4-5f23-42d6-bea5-c7cc89674d41
@@ -166,7 +166,7 @@ where $y_i$ are the labels for the $i$th object and $x_i$ are the input data for
 We estimate weights $w$ by the values that maximize the log-likelihood function above, or equivalently the values that minimize the negative log-likelihood function divided by the number of observations.  This is already coded up as the function `binarycrossentropy(predictions, observations)`.
 
 !!! tip "Terminology"
-    In the machine learning community, the function to be minimized is commonly called the loss function (or cost function).  This is slightly more general, since the loss function does not necessarily need to be proportional to a negative log likelihood.  For example, a loss function could also include a log prior term or an more arbitrary regularization penalty term.
+    In the machine learning community, the function to be minimized is commonly called the loss function (or cost function).  This is slightly more general, since the loss function does not necessarily need to be proportional to a negative log likelihood.  For example, a loss function could also include a log prior term or a more arbitrary regularization penalty term.
 """
 
 # ╔═╡ 014fb3c0-ae99-494a-8b2b-c02f4c6c6dd8
