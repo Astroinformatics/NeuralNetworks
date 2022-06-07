@@ -691,7 +691,7 @@ br = html"<br />"
 
 # ╔═╡ 1d8fe699-810b-44ba-a9cd-80816338e08c
 md"""
-# Lab 13: Neural Networks for $br Identifying high-z quasars
+# Lab 14: Neural Networks for $br Identifying high-z quasars
 #### [Penn State Astroinformatics Summer School 2022](https://sites.psu.edu/astrostatistics/astroinfo-su22-program/)
 #### [Eric Ford](https://www.personal.psu.edu/ebf11)
 """
