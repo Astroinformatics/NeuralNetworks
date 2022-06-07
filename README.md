@@ -21,7 +21,8 @@ Others may install Julia and Pluto on their local computer with the following st
 julia> using Pkg
 julia> Pkg.add("Pluto")
 ```
-Steps 1 & 3 only need to be done once per computer.
+(Steps 1 & 3 only need to be done once per computer.)
+
 4.  Start Pluto
 ```julia
 julia> using Pluto
