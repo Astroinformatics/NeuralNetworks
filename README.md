@@ -5,7 +5,7 @@
 
 -----
 This repository contains one computational notebook: 
-- neuralnetwork_intro.jl:  Provides an introduction to neural networks using classification of high-redshift quasars as an example
+- neuralnetwork_intro.jl ([Pluto notebook](https://astroinformatics.github.io/NeuralNetworks/neuralnetwork_intro.html)):  Provides an introduction to neural networks using classification of high-redshift quasars as an example
 
 The lab does not assume familiarity with Julia.  While it can be useful to "read" selected portions of the code, the lab tutorials aim to emphasize understanding how algorithms work, while minimizing need to pay attention to a language's syntax.
 
