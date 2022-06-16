@@ -73,12 +73,12 @@ Eventually, you'll be experimenting with multiple neural network architectures.
 We want to save the data in `df_test` for testing after we've finalized all our model choices.
 In the mean time, we'll want to have subsets of the observations in `df_cv` for training and validating as part of a **k-fold cross-validation** process.
 
-Below, you can choose how many "folds" to use and which fold will be used for training our logistic regression and neural network models.
+Below, you can choose how many "folds" to use and which fold will be used for the validation set.  That choice implicitly determine which n-1 folds will be used for training our logistic regression and neural network models.
 """
 
 # ╔═╡ 7e0341a3-e52e-4a19-b9ac-969ebdd2161f
 md"""
-For convenience sake, we'll define several dataframes containing data from your chosen fold.  
+For convenience sake, we'll define several dataframes containing data based on your chosen fold.  
 """
 
 # ╔═╡ 4aff0575-014d-4757-8e69-f49ad1f2e82e
@@ -109,14 +109,14 @@ md"""
 # ╔═╡ 7022d21e-10f3-46ac-a5fa-b4b6f7ab7881
 md"""
 ### Compare results across folds
-Since generalized linear regression is computationally efficient, we can go ahead and fit a logistic regression model to each of the folds of data.  
+Since generalized linear regression is computationally efficient, we can go ahead and fit logistic regression models (one for each of the fold of data).  
 
 Below we show histograms of the false discovery rates and false omission rates for each fold.  
-The next cell shows the coefficients fit to each training fold.  
+The next cell shows the coefficients fit the training set for each fold.  
 """
 
 # ╔═╡ f1e1d4ab-d1bf-4684-b3f6-3233b689ba71
-md"We can compute the mean and standard deviation of each coefficient across different training folds."
+md"We can compute the mean and standard deviation of each coefficient across the training data set for each different folds."
 
 # ╔═╡ 54f52161-2337-40fc-a743-58cc0492726f
 md"""
@@ -124,7 +124,7 @@ md"""
 """
 
 # ╔═╡ 84c733a4-5f23-42d6-bea5-c7cc89674d41
-md"In the subsequent sections on neural networks, we'll use a loss function that is equal to negative log likelihood divided by the number of observations.  Let's compute that loss function for results of the standard logistic regression model on each training fold, so we'll be able to make comparisons later."
+md"In the subsequent sections on neural networks, we'll use a loss function that is equal to negative log likelihood divided by the number of observations.  Let's compute that loss function for results of the standard logistic regression model on the training dataset for each fold, so we'll be able to make comparisons later."
 
 # ╔═╡ bd6b7f5f-7f64-41ce-9ce8-639d6435800a
 md"""
@@ -248,7 +248,7 @@ md"""
 
 **Question:**  Can you find a network architecture and training strategy that performs significantly better than the simple neural network and the logistic regression classifier?  What are its properties?  
 
-**Question:**  Does your best neural network perform as well if you change the fold used for training and validation (way at the top of the notebook)?
+**Question:**  Does your best neural network perform as well if you change the folds used for training and validation (way at the top of the notebook)?
 
 **Question:**  Why was it so important to pick out a distinct test dataset at the very beginning of the notebook?
 """
@@ -469,7 +469,7 @@ nbsp = html"&nbsp;"
 @bind param_fold confirm(PlutoUI.combine() do Child
 md"""
 Number of folds:  $(Child("num_folds", NumberField(1:10,default=5))) $nbsp $nbsp
-Fold to use for training:  $(Child("fold_id", NumberField(1:10)))
+Fold to use for validation:  $(Child("fold_id", NumberField(1:10)))
 """ end )
 
 # ╔═╡ ca25abcc-4f7e-4ace-861b-c8f0416584ed
